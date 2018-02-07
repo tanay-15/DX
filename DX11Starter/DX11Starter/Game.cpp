@@ -59,6 +59,7 @@ Game::~Game()
 	delete Player3;
 	delete Player4;
 	delete Player5;
+	delete View;
 	
 }
 
@@ -104,33 +105,10 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateMatrices()
 {
-	// Set up world matrix
-	// Create the View matrix
-	// - In an actual game, recreate this matrix every time the camera 
-	//    moves (potentially every frame)
-	// - We're using the LOOK TO function, which takes the position of the
-	//    camera and the direction vector along which to look (as well as "up")
-	// - Another option is the LOOK AT function, to look towards a specific
-	//    point in 3D space
-	//XMVECTOR pos = XMVectorSet(0, 0, -5, 0);
-	//
-	//XMVECTOR dir = XMVectorSet(0, 0, 1, 0);
-	//XMVECTOR up = XMVectorSet(0, 1, 0, 0);
-	//XMMATRIX V = XMMatrixLookToLH(
-	//	pos,     // The position of the "camera"
-	//	dir,     // Direction the camera is looking
-	//	up);     // "Up" direction in 3D space (prevents roll)
-	//XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(V)); // Transpose for HLSL!
-
-	// Create the Projection matrix
-	// - This should match the window's aspect ratio, and also update anytime
-	//    the window resizes (which is already happening in OnResize() below)
-	//XMMATRIX P = XMMatrixPerspectiveFovLH(
-	//	0.25f * 3.1415926535f,		// Field of View Angle
-	//	(float)width / height,		// Aspect ratio
-	//	0.1f,						// Near clip plane distance
-	//	100.0f);					// Far clip plane distance
-	//XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
+	XMFLOAT3 cameraPosition = XMFLOAT3(0.0f, 0.0f, -5.0f);
+	View = new Camera(cameraPosition, 0.0f,0.0f,0.0f,width,height);
+	View->pMatrix(width, height);
+	
 }
 
 
@@ -197,7 +175,7 @@ void Game::CreateBasicGeometry()
 //	Player5 = new GameEntity(Quad);
 //	entityList.push_back(Player5);
 	// View and Projection Matrix
-	View = new Camera();
+	
 
 }
 
@@ -211,13 +189,14 @@ void Game::OnResize()
 	// Handle base-level DX resize stuff
 	DXCore::OnResize();
 
+	View->pMatrix(width, height);
 	// Update our projection matrix since the window size changed
-	XMMATRIX P = XMMatrixPerspectiveFovLH(
-		0.25f * 3.1415926535f,	// Field of View Angle
-		(float)width / height,	// Aspect ratio
-		0.1f,				  	// Near clip plane distance
-		100.0f);			  	// Far clip plane distance
-	XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
+	//XMMATRIX P = XMMatrixPerspectiveFovLH(
+	//	0.25f * 3.1415926535f,	// Field of View Angle
+	//	(float)width / height,	// Aspect ratio
+	//	0.1f,				  	// Near clip plane distance
+	//	100.0f);			  	// Far clip plane distance
+	//XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(P)); // Transpose for HLSL!
 }
 
 
@@ -241,19 +220,39 @@ void Game::Update(float deltaTime, float totalTime)
 	Player5->setScale(0.5f, 0.5, 0.5f);
 	Player5->setRotation(sin(i*0.0015));
 	Player5->updateWorld();
-
+	float speed = 1.5f;
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+	if (GetAsyncKeyState('W') & 0x8000)
+	{
+		View->moveForward(deltaTime * speed);
+	}
+
+	if (GetAsyncKeyState('S') & 0x8000)
+	{
+		View->moveForward(-1.0f * deltaTime * speed);
+	}
+
+	if (GetAsyncKeyState('D') & 0x8000) 
+	{
+		View->moveRight( deltaTime * speed);
+	}
+
+	if (GetAsyncKeyState('A') & 0x8000) 
+	{
+		View->moveRight(-1.0f * deltaTime * speed);
+	}
+	View->cameraUpdate();
 }
 //--------------------------------------------------------
 //Send data to shader variables
 //--------------------------------------------------------
 
-void Game::datatoShader(GameEntity* GE)
+void Game::datatoShader(GameEntity* GE, Camera* C)
 {
 	vertexShader->SetMatrix4x4("world", GE->worldMatrix);
-	vertexShader->SetMatrix4x4("view", viewMatrix);
-	vertexShader->SetMatrix4x4("projection", projectionMatrix);
+	vertexShader->SetMatrix4x4("view", C->getviewMatrix());
+	vertexShader->SetMatrix4x4("projection", C->getprojectionMatrix());
 	vertexShader->CopyAllBufferData();
 	vertexShader->SetShader();
 	pixelShader->SetShader();
@@ -272,7 +271,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		1.0f,
 		0);
-	datatoShader(Player);			//ENTITY 1
+	datatoShader(Player,View);			//ENTITY 1
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
 	ID3D11Buffer* VB;
@@ -291,7 +290,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 
-	datatoShader(Player2);			//ENTITY 2
+	datatoShader(Player2,View);			//ENTITY 2
 	VB = Player2->getMesh()->GetVertexBuffer();
 
 	context->IASetVertexBuffers(0, 1, &VB, &stride, &offset);
@@ -303,7 +302,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 
-	datatoShader(Player3);		//ENTITY 3
+	datatoShader(Player3,View);		//ENTITY 3
 	UINT stride1 = sizeof(Vertex);
 	UINT offset1 = 0;
 	ID3D11Buffer* squareVB;
@@ -323,7 +322,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		0);    // Offset to add to each index when looking up vertices
 
 
-	datatoShader(Player4);   // ENTITY 4
+	datatoShader(Player4,View);   // ENTITY 4
 	squareVB = Player4->getMesh()->GetVertexBuffer();
 	context->IASetVertexBuffers(0, 1, &squareVB, &stride1, &offset1);
 	squareIB = Player4->getMesh()->GetIndexBuffer();
@@ -334,7 +333,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 	
-	datatoShader(Player5); //ENTITY 5
+	datatoShader(Player5,View); //ENTITY 5
 
 	UINT stride2 = sizeof(Vertex);
 	UINT offset2 = 0;
@@ -399,6 +398,13 @@ void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 {
 	// Add any custom code here...
+	if (buttonState & 0x0001) {
+		float diffX = x - float(prevMousePos.x);
+		float diffY = y - float(prevMousePos.y);
+
+		View->updateRotationX(diffY * 0.001f);
+		View->updateRotationY(diffX * 0.001f);
+	}
 
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;

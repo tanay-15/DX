@@ -23,7 +23,7 @@ public:
 	void Init();
 	void OnResize();
 	void Update(float deltaTime, float totalTime);
-	void datatoShader(GameEntity* GE);
+	void datatoShader(GameEntity* GE, Camera* C);
 	void Draw(float deltaTime, float totalTime);
 
 	// Overridden mouse input helper methods
