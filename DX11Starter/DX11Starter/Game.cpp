@@ -207,18 +207,18 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	// Quit if the escape key is pressed
 	i++;
-	Player->setTranslation(sin(i*0.0015), 0.0f, 0.0f);
+	Player->setTranslation(float(sin(i*0.0015)), 0.0f, 0.0f);
 	Player->setScale(0.5f, 0.5f, 0.5f);
 	Player->updateWorld();
-	Player2->setScale(sin(i*0.0015), sin(i*0.0015), 1);
+	Player2->setScale(float(sin(i*0.0015)), float(sin(i*0.0015)), 1);
 	Player2->updateWorld();
-	Player3->setTranslation(0.0f , sin(i*0.0015), 0.0f);
+	Player3->setTranslation(0.0f , float(sin(i*0.0015)), 0.0f);
 	Player3->updateWorld();
-	Player4->setScale(1.0f, sin(i*0.0015), 1.0f);
+	Player4->setScale(1.0f, float(sin(i*0.0015)), 1.0f);
 	Player4->updateWorld();
 	Player5->setTranslation(-1.0f, 0.0f, 0.0f);
 	Player5->setScale(0.5f, 0.5, 0.5f);
-	Player5->setRotation(sin(i*0.0015));
+	Player5->setRotation(float(sin(i*0.0015)));
 	Player5->updateWorld();
 	float speed = 1.5f;
 	if (GetAsyncKeyState(VK_ESCAPE))
