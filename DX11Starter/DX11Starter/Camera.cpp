@@ -81,18 +81,18 @@ void Camera::moveForward(float value)
 
 void Camera::moveLeft(float value)
 {
-	XMVECTOR rightSide;
+	XMVECTOR leftSide;
 	XMVECTOR up = XMVectorSet(0, 1, 0, 0);
 	XMVECTOR dir = XMLoadFloat3(&direction);
-	rightSide = XMVector3Cross(dir, up); // left or right vectors can be found out by cross product of the direction of camera 
+	leftSide = XMVector3Cross(dir, up); // left or right vectors can be found out by cross product of the direction of camera 
 										//& the up direction
-	rightSide = XMVector3Normalize(rightSide);
-	XMFLOAT3 rightSideValue;
-	XMStoreFloat3(&rightSideValue, rightSide);
+	leftSide = XMVector3Normalize(leftSide);
+	XMFLOAT3 leftSideValue;
+	XMStoreFloat3(&leftSideValue, leftSide);
 
-	position.x += rightSideValue.x * value;
-	position.y += rightSideValue.y * value;
-	position.z += rightSideValue.z * value;
+	position.x += leftSideValue.x * value;
+	position.y += leftSideValue.y * value;
+	position.z += leftSideValue.z * value;
 
 	flag = true;
 
@@ -100,7 +100,7 @@ void Camera::moveLeft(float value)
 
 void Camera::updateRotationX(float value)
 {
-	if (rotationX + value < 0.3f & rotationX + value > -0.3f) 
+	if (rotationX + value < 0.5f & rotationX + value > -0.5f) 
 	{
 		rotationX += value;
 		flag = true;
