@@ -60,6 +60,7 @@ Game::~Game()
 	delete Player4;
 	delete Player5;
 	delete View;
+	delete newMaterial;
 	
 }
 
@@ -95,6 +96,8 @@ void Game::LoadShaders()
 
 	pixelShader = new SimplePixelShader(device, context);
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
+
+	newMaterial = new Material(vertexShader, pixelShader);
 }
 
 
@@ -136,8 +139,8 @@ void Game::CreateBasicGeometry()
 	
 	//Quad = new Mesh(quad, qindices, 4,countIndex, device);
 	Quad = new Mesh(quad, qindices, 4, 6, device);
-	Player = new GameEntity(Quad);
-	Player2 = new GameEntity(Quad);
+	Player = new GameEntity(Quad, newMaterial);
+	Player2 = new GameEntity(Quad, newMaterial);
 
 	Vertex square[] =											//square
 	{
@@ -149,8 +152,8 @@ void Game::CreateBasicGeometry()
 
 	int sindices[] = { 0, 1, 2, 0, 2, 3 };
 	Square = new Mesh(square, sindices, 4, 6, device);
-	Player3 = new GameEntity(Square);
-	Player4 = new GameEntity(Square);
+	Player3 = new GameEntity(Square, newMaterial);
+	Player4 = new GameEntity(Square, newMaterial);
 
 	Vertex hexagon[] =											//Hexagon
 	{
@@ -164,7 +167,7 @@ void Game::CreateBasicGeometry()
 
 	int hindices[] = { 0, 1, 5, 1, 2, 3, 1, 3, 4, 1, 4, 5 };
 	Hexagon = new Mesh(hexagon, hindices, 6, 12, device);
-	Player5 = new GameEntity(Hexagon);
+	Player5 = new GameEntity(Hexagon, newMaterial);
 //	entityList.push_back(Player);
 //	Player2 = new GameEntity(Quad);
 //	entityList.push_back(Player2);
@@ -235,12 +238,12 @@ void Game::Update(float deltaTime, float totalTime)
 
 	if (GetAsyncKeyState('D') & 0x8000) 
 	{
-		View->moveRight( deltaTime * speed);
+		View->moveLeft( -1.0f * deltaTime * speed);
 	}
 
 	if (GetAsyncKeyState('A') & 0x8000) 
 	{
-		View->moveRight(-1.0f * deltaTime * speed);
+		View->moveLeft( deltaTime * speed);
 	}
 	View->cameraUpdate();
 }
@@ -250,12 +253,9 @@ void Game::Update(float deltaTime, float totalTime)
 
 void Game::datatoShader(GameEntity* GE, Camera* C)
 {
-	vertexShader->SetMatrix4x4("world", GE->worldMatrix);
-	vertexShader->SetMatrix4x4("view", C->getviewMatrix());
-	vertexShader->SetMatrix4x4("projection", C->getprojectionMatrix());
-	vertexShader->CopyAllBufferData();
-	vertexShader->SetShader();
-	pixelShader->SetShader();
+	GameEntity* tempGE = GE;
+	Camera* tempC = C;
+	tempGE->prepareMaterial(tempC);
 }
 // --------------------------------------------------------
 // Clear the screen, redraw everything, present to the user

@@ -79,7 +79,7 @@ void Camera::moveForward(float value)
 	flag = true;
 }
 
-void Camera::moveRight(float value)
+void Camera::moveLeft(float value)
 {
 	XMVECTOR rightSide;
 	XMVECTOR up = XMVectorSet(0, 1, 0, 0);

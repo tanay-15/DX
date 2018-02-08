@@ -43,6 +43,7 @@ private:
 	Mesh* Quad;
 	Mesh* Square;
 	Mesh* Hexagon;
+	Material* newMaterial;
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders(); 
 	void CreateMatrices();

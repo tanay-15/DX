@@ -47,9 +47,10 @@ void GameEntity::updateWorld()
 
 }
 
-GameEntity::GameEntity(Mesh* m)
+GameEntity::GameEntity(Mesh* m,Material* m1)
 {
 	mesh = m;
+	material = m1;
 	position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	rotation = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	scale = XMFLOAT3(1.0f, 1.0f, 1.0f);
@@ -61,6 +62,23 @@ GameEntity::GameEntity(Mesh* m)
 Mesh* GameEntity::getMesh()
 {
 	return mesh;
+}
+
+Material * GameEntity::getMaterial()
+{
+	return material;
+}
+
+void GameEntity::prepareMaterial(Camera* C)
+{
+	SimpleVertexShader* localvertexShader = this->getMaterial()->getvertexShader();
+	SimplePixelShader* localpixelShader = this->getMaterial()->getpixelShader();
+	localvertexShader->SetMatrix4x4("world", this->worldMatrix);
+	localvertexShader->SetMatrix4x4("view", C->getviewMatrix());
+	localvertexShader->SetMatrix4x4("projection", C->getprojectionMatrix());
+	localvertexShader->CopyAllBufferData();
+	localvertexShader->SetShader();
+	localpixelShader->SetShader();
 }
 
 GameEntity::~GameEntity()

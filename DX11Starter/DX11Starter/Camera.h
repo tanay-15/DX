@@ -1,7 +1,6 @@
 #pragma once
 #include "DXCore.h"
 #include "Mesh.h"
-#include"GameEntity.h"
 #include "SimpleShader.h"
 #include <DirectXMath.h>
 class Camera 
@@ -22,7 +21,7 @@ public:
 	XMFLOAT4X4 getviewMatrix();
 	XMFLOAT4X4 getprojectionMatrix();
 	void moveForward(float value);
-	void moveRight(float value);
+	void moveLeft(float value);
 	void updateRotationX(float value);
 	void updateRotationY(float factor);
 };
