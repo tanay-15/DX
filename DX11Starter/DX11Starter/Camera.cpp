@@ -100,18 +100,12 @@ void Camera::moveLeft(float value)
 
 void Camera::updateRotationX(float value)
 {
-	if (rotationX + value < 0.5f & rotationX + value > -0.5f) 
-	{
-		rotationX += value;
-		flag = true;
-	}
+	rotationX += value;
+	flag = true;
 }
 
 void Camera::updateRotationY(float value)
 {
-	if (rotationY + value < 0.6f & rotationY + value > -0.6f)
-	{
 	rotationY += value;
 	flag = true;
-	}
 }
