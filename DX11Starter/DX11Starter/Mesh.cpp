@@ -10,13 +10,13 @@ Mesh::Mesh()
 	
 }
 
-Mesh::Mesh(Vertex Vertices[], int indices[],int noofVertices, int noofIndices, ID3D11Device* Device)
+Mesh::Mesh(Vertex Vertices[], unsigned int indices[],int noofVertices, int noofIndices, ID3D11Device* Device)
 {	
 	createBuffers(Vertices, indices, noofVertices, noofIndices, Device);
 }
 
 
-void Mesh::createBuffers(Vertex Vertices[], int indices[], int noofVertices, int noofIndices, ID3D11Device* Device)
+void Mesh::createBuffers(Vertex Vertices[], unsigned int indices[], int noofVertices, int noofIndices, ID3D11Device* Device)
 {
 	D3D11_BUFFER_DESC vbi;
 	vbi.Usage = D3D11_USAGE_IMMUTABLE;
@@ -55,19 +55,18 @@ void Mesh::createBuffers(Vertex Vertices[], int indices[], int noofVertices, int
 	// Actually create the buffer with the initial data
 	// - Once we do this, we'll NEVER CHANGE THE BUFFER AGAIN
 	Device->CreateBuffer(&ibd, &initialIndexData, &indexBuffer);
-
+	indexCount = noofIndices;
 }
 
-Mesh::Mesh(char * filecontents, ID3D11Device* Device)
+Mesh::Mesh(char * objFile, ID3D11Device* Device)
 {
-	std::ifstream obj;
-	obj.open(filecontents);
+	// File input object
+	std::ifstream obj(objFile);
 
 	// Check for successful open
 	if (!obj.is_open())
-	{
 		return;
-	}
+
 	// Variables used while reading the file
 	std::vector<XMFLOAT3> positions;     // Positions from the file
 	std::vector<XMFLOAT3> normals;       // Normals from the file
@@ -210,15 +209,26 @@ Mesh::Mesh(char * filecontents, ID3D11Device* Device)
 				indices.push_back(vertCounter); vertCounter += 1;
 				indices.push_back(vertCounter); vertCounter += 1;
 				indices.push_back(vertCounter); vertCounter += 1;
-				
 			}
 		}
 	}
-	vertexCounter = vertCounter;
+
 	// Close the file and create the actual buffers
 	obj.close();
 
-	createBuffers(&verts[0],(int*) &indices[0], vertCounter, vertCounter, Device);
+
+	// - At this point, "verts" is a vector of Vertex structs, and can be used
+	//    directly to create a vertex buffer:  &verts[0] is the address of the first vert
+	//
+	// - The vector "indices" is similar. It's a vector of unsigned ints and
+	//    can be used directly for the index buffer: &indices[0] is the address of the first int
+	//
+	// - "vertCounter" is BOTH the number of vertices and the number of indices
+	// - Yes, the indices are a bit redundant here (one per vertex).  Could you skip using
+	//    an index buffer in this case?  Sure!  Though, if your mesh class assumes you have
+	//    one, you'll need to write some extra code to handle cases when you don't.
+
+	createBuffers(&verts[0],&indices[0], vertCounter, vertCounter, Device);
 
 }
 

@@ -57,6 +57,8 @@ GameEntity::GameEntity(Mesh* m,Material* m1)
 	this->setTranslation(0.0f, 0.0f, 0.0f);
 	this->setScale(1.0f, 1.0f, 1.0f);
 	this->setRotation(0.0f);
+	updateWorld();
+
 }
 
 Mesh* GameEntity::getMesh()

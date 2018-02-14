@@ -61,6 +61,8 @@ Game::~Game()
 	delete Player5;
 	delete View;
 	delete newMaterial;
+	delete Object1;
+	delete Objects;
 	
 }
 
@@ -120,7 +122,7 @@ void Game::CreateMatrices()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	
+	/*
 	/*XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);*/
@@ -136,7 +138,7 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(-1.5f, +0.0f, +0.0f), normal, uv}
 	};
 
-	int qindices[] = { 0, 1, 2, 0, 2, 3};
+	unsigned int qindices[] = { 0, 1, 2, 0, 2, 3};
 	//int countIndex = 0;
 	//countIndex= Mindinces.GetIndexCount(qindices);
 	
@@ -153,7 +155,7 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(+1.6f, +0.0f, +0.0f), normal, uv }
 	};
 
-	int sindices[] = { 0, 1, 2, 0, 2, 3 };
+	unsigned int sindices[] = { 0, 1, 2, 0, 2, 3 };
 	Square = new Mesh(square, sindices, 4, 6, device);
 	Player3 = new GameEntity(Square, newMaterial);
 	Player4 = new GameEntity(Square, newMaterial);
@@ -168,10 +170,10 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(-3.2f, +0.9f, +0.0f),normal, uv }
 	};
 
-	int hindices[] = { 0, 1, 5, 1, 2, 3, 1, 3, 4, 1, 4, 5 };
+	unsigned int hindices[] = { 0, 1, 5, 1, 2, 3, 1, 3, 4, 1, 4, 5 };
 	Hexagon = new Mesh(hexagon, hindices, 6, 12, device);
 	Player5 = new GameEntity(Hexagon, newMaterial);
-
+	
 	Objects = new Mesh("cone.obj", device);
 	Object1 = new GameEntity(Objects, newMaterial);
 	
@@ -219,6 +221,7 @@ void Game::Update(float deltaTime, float totalTime)
 	Player5->setScale(0.5f, 0.5, 0.5f);
 	Player5->setRotation(float(sin(i*0.0015)));
 	Player5->updateWorld();
+
 	float speed = 1.5f;
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
@@ -267,6 +270,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		1.0f,
 		0);
+	/*
 	datatoShader(Player,View);			//ENTITY 1
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
@@ -349,21 +353,24 @@ void Game::Draw(float deltaTime, float totalTime)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 
+	
+	*/
 
 	datatoShader(Object1, View); //ENTITY  = OBJECT1 = CONE
+	UINT stride3 = sizeof(Vertex);
+	UINT offset3 = 0;
 
 	ID3D11Buffer* coneVB;
 	coneVB = Object1->getMesh()->GetVertexBuffer();
 
-	context->IASetVertexBuffers(0, 1, &hexVB, &stride2, &offset2);
+	context->IASetVertexBuffers(0, 1, &coneVB, &stride3, &offset3);
 
 	ID3D11Buffer* coneIB;
 	coneIB = Object1->getMesh()->GetIndexBuffer();
 	context->IASetIndexBuffer(coneIB, DXGI_FORMAT_R32_UINT, 0);
-	int Cindice;
-	Cindice = Object1->getMesh()->getVertexCount();
+	
 	context->DrawIndexed(
-		Cindice,     // The number of indices to use (we could draw a subset if we wanted)
+		Object1->getMesh()->indexCount,     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 
