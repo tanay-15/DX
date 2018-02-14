@@ -121,16 +121,19 @@ void Game::CreateMatrices()
 void Game::CreateBasicGeometry()
 {
 	
-	XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+	/*XMFLOAT4 red = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	XMFLOAT4 green = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);*/
+
+	XMFLOAT3 normal = XMFLOAT3(0, 0, -1);
+	XMFLOAT2 uv = XMFLOAT2(0, 0);
 
 	Vertex quad[] =												//quadrilateral
 	{
-		{ XMFLOAT3(+0.0f, +1.0f, +0.0f), red },
-		{ XMFLOAT3(+1.5f, +0.0f, +0.0f), blue },
-		{ XMFLOAT3(+0.0f, -1.0f, +0.0f), red },
-		{ XMFLOAT3(-1.5f, +0.0f, +0.0f), green }
+		{ XMFLOAT3(+0.0f, +1.0f, +0.0f), normal, uv},
+		{ XMFLOAT3(+1.5f, +0.0f, +0.0f), normal, uv},
+		{ XMFLOAT3(+0.0f, -1.0f, +0.0f), normal, uv},
+		{ XMFLOAT3(-1.5f, +0.0f, +0.0f), normal, uv}
 	};
 
 	int qindices[] = { 0, 1, 2, 0, 2, 3};
@@ -144,10 +147,10 @@ void Game::CreateBasicGeometry()
 
 	Vertex square[] =											//square
 	{
-		{ XMFLOAT3(+2.4f, +0.9f, +0.0f), red },
-		{ XMFLOAT3(+3.2f, +0.0f, +0.0f), blue },
-		{ XMFLOAT3(+2.4f, -0.9f, +0.0f), red },
-		{ XMFLOAT3(+1.6f, +0.0f, +0.0f), green }
+		{ XMFLOAT3(+2.4f, +0.9f, +0.0f), normal, uv },
+		{ XMFLOAT3(+3.2f, +0.0f, +0.0f), normal, uv },
+		{ XMFLOAT3(+2.4f, -0.9f, +0.0f), normal, uv },
+		{ XMFLOAT3(+1.6f, +0.0f, +0.0f), normal, uv }
 	};
 
 	int sindices[] = { 0, 1, 2, 0, 2, 3 };
@@ -157,27 +160,20 @@ void Game::CreateBasicGeometry()
 
 	Vertex hexagon[] =											//Hexagon
 	{
-		{ XMFLOAT3(-2.4f, +0.9f, +0.0f), red },
-		{ XMFLOAT3(-1.6f, +0.0f, +0.0f), blue },
-		{ XMFLOAT3(-2.4f, -0.9f, +0.0f), red },
-		{ XMFLOAT3(-3.2f, -0.9f, +0.0f), green },
-		{ XMFLOAT3(-3.6f, 0.0f, +0.0f), blue },
-		{ XMFLOAT3(-3.2f, +0.9f, +0.0f), green },
+		{ XMFLOAT3(-2.4f, +0.9f, +0.0f), normal, uv },
+		{ XMFLOAT3(-1.6f, +0.0f, +0.0f), normal, uv },
+		{ XMFLOAT3(-2.4f, -0.9f, +0.0f), normal, uv },
+		{ XMFLOAT3(-3.2f, -0.9f, +0.0f), normal, uv },
+		{ XMFLOAT3(-3.6f, 0.0f, +0.0f), normal, uv },
+		{ XMFLOAT3(-3.2f, +0.9f, +0.0f),normal, uv }
 	};
 
 	int hindices[] = { 0, 1, 5, 1, 2, 3, 1, 3, 4, 1, 4, 5 };
 	Hexagon = new Mesh(hexagon, hindices, 6, 12, device);
 	Player5 = new GameEntity(Hexagon, newMaterial);
-//	entityList.push_back(Player);
-//	Player2 = new GameEntity(Quad);
-//	entityList.push_back(Player2);
-//	Player3 = new GameEntity(Quad);
-//	entityList.push_back(Player3);
-//	Player4 = new GameEntity(Quad);
-//	entityList.push_back(Player4);
-//	Player5 = new GameEntity(Quad);
-//	entityList.push_back(Player5);
-	// View and Projection Matrix
+
+	Objects = new Mesh("cone.obj", device);
+	Object1 = new GameEntity(Objects, newMaterial);
 	
 
 }
@@ -352,6 +348,25 @@ void Game::Draw(float deltaTime, float totalTime)
 		Hindice,     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
+
+
+	datatoShader(Object1, View); //ENTITY  = OBJECT1 = CONE
+
+	ID3D11Buffer* coneVB;
+	coneVB = Object1->getMesh()->GetVertexBuffer();
+
+	context->IASetVertexBuffers(0, 1, &hexVB, &stride2, &offset2);
+
+	ID3D11Buffer* coneIB;
+	coneIB = Object1->getMesh()->GetIndexBuffer();
+	context->IASetIndexBuffer(coneIB, DXGI_FORMAT_R32_UINT, 0);
+	int Cindice;
+	Cindice = Object1->getMesh()->getVertexCount();
+	context->DrawIndexed(
+		Cindice,     // The number of indices to use (we could draw a subset if we wanted)
+		0,     // Offset to the first index we want to use
+		0);    // Offset to add to each index when looking up vertices
+
 	
 	swapChain->Present(0, 0);
 }

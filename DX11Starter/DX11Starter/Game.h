@@ -43,6 +43,8 @@ private:
 	Mesh* Quad;
 	Mesh* Square;
 	Mesh* Hexagon;
+	Mesh* Objects;
+	GameEntity* Object1;
 	Material* newMaterial;
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders(); 
