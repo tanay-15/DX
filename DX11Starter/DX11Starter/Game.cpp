@@ -85,6 +85,11 @@ void Game::Init()
 	dLight.DiffuseColor = XMFLOAT4(0, 0, 1, 1);
 	dLight.Direction = XMFLOAT3(1, -1, 0);
 
+	dLight1.AmbientColor = XMFLOAT4(0.1, 0.1, 0.1, 1.0);
+	dLight1.DiffuseColor = XMFLOAT4(1, 0, 0, 1);
+	dLight1.Direction = XMFLOAT3(-1, 1, 0);
+
+
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -183,7 +188,8 @@ void Game::CreateBasicGeometry()
 	Objects = new Mesh("sphere.obj", device);
 	Object1 = new GameEntity(Objects, newMaterial);
 	
-
+	Cone = new Mesh("cone.obj", device);
+	Object2 = new GameEntity(Cone, newMaterial);
 }
 
 
@@ -230,6 +236,8 @@ void Game::Update(float deltaTime, float totalTime)
 	Object1->setRotation(deltaTime);
 	Object1->setTranslation(sin(totalTime) * 2, 0, 0);
 	Object1->updateWorld();
+	Object2->setTranslation(2, sin(totalTime) * 2, 0);
+	Object2->updateWorld();
 
 	float speed = 1.5f;
 	if (GetAsyncKeyState(VK_ESCAPE))
@@ -365,22 +373,44 @@ void Game::Draw(float deltaTime, float totalTime)
 	
 	*/
 
+	pixelShader->SetData("light", &dLight, sizeof(DirectionalLight));
+
+	pixelShader->SetData("dlight", &dLight1, sizeof(DirectionalLight1));
+
 	datatoShader(Object1, View); //ENTITY  = OBJECT1 = CONE
 	UINT stride3 = sizeof(Vertex);
 	UINT offset3 = 0;
 
+	ID3D11Buffer* sphereVB;
+	sphereVB = Object1->getMesh()->GetVertexBuffer();
+
+	context->IASetVertexBuffers(0, 1, &sphereVB, &stride3, &offset3);
+
+	ID3D11Buffer* sphereIB;
+	sphereIB = Object1->getMesh()->GetIndexBuffer();
+	context->IASetIndexBuffer(sphereIB, DXGI_FORMAT_R32_UINT, 0);
+	
+
+	context->DrawIndexed(
+		Object1->getMesh()->indexCount,     // The number of indices to use (we could draw a subset if we wanted)
+		0,     // Offset to the first index we want to use
+		0);    // Offset to add to each index when looking up vertices
+
+
+	datatoShader(Object2, View); //ENTITY  = OBJECT1 = CONE
+
 	ID3D11Buffer* coneVB;
-	coneVB = Object1->getMesh()->GetVertexBuffer();
+	coneVB = Object2->getMesh()->GetVertexBuffer();
 
 	context->IASetVertexBuffers(0, 1, &coneVB, &stride3, &offset3);
 
 	ID3D11Buffer* coneIB;
-	coneIB = Object1->getMesh()->GetIndexBuffer();
+	coneIB = Object2->getMesh()->GetIndexBuffer();
 	context->IASetIndexBuffer(coneIB, DXGI_FORMAT_R32_UINT, 0);
-	
-	pixelShader->SetData("light", &dLight, sizeof(DirectionalLight));
+
+
 	context->DrawIndexed(
-		Object1->getMesh()->indexCount,     // The number of indices to use (we could draw a subset if we wanted)
+		Object2->getMesh()->indexCount,     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use
 		0);    // Offset to add to each index when looking up vertices
 

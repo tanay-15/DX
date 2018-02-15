@@ -79,6 +79,7 @@ void GameEntity::prepareMaterial(Camera* C)
 	localvertexShader->SetMatrix4x4("view", C->getviewMatrix());
 	localvertexShader->SetMatrix4x4("projection", C->getprojectionMatrix());
 	localvertexShader->CopyAllBufferData();
+	localpixelShader->CopyAllBufferData();
 	localvertexShader->SetShader();
 	localpixelShader->SetShader();
 	//localpixelShader->SetFloat3("")

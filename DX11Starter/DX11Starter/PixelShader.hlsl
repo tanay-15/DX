@@ -24,10 +24,19 @@ struct DirectionalLight
 	float3 Direction;
 };
 
+
+
+struct DirectionalLight1
+{
+	float4 AmbientColor;
+	float4 DiffuseColor;
+	float3 Direction;
+};
+
 cbuffer externalData : register(b0)
 {
 	DirectionalLight light;
-
+	DirectionalLight1 dlight;
 };
 // --------------------------------------------------------
 // The entry point (main method) for our pixel shader
@@ -42,9 +51,20 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	input.normal = normalize(input.normal);
 
+
 	float3 lightDirection = -normalize(light.Direction);
-	float dirNdotL = dot(input.normal, lightDirection);
-	dirNdotL = saturate(dirNdotL);
+	float lightAmount = dot(input.normal, lightDirection);
+	lightAmount = saturate(lightAmount);
+	float3 finalColor = (light.DiffuseColor * lightAmount + light.AmbientColor);
+
+
+	float3 lightDirection1 = -normalize(dlight.Direction);
+	float lightAmount1 = dot(input.normal, lightDirection1);
+	lightDirection1 = saturate(lightAmount1);
+	float3 finalColor1 = (dlight.DiffuseColor *lightAmount1 + dlight.AmbientColor);
+
+
+	return float4((finalColor + finalColor1).xyz, 1);
 	//return float4(input.normal, 1);
 	// Just return the input color
 	// - This color (like most values passing through the rasterizer) is 
@@ -52,6 +72,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 	//   of the triangle we're rendering
 	//return input.color;
 	//return float4(pointNdotL);
-	return float4((light.DiffuseColor * dirNdotL + light.AmbientColor).xxx, 1);
+	//return float4((light.DiffuseColor * lightAmount + light.AmbientColor).xyz, 1);
 	//return float4(1, 0, 0, 1);
 }

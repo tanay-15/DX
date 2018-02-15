@@ -45,7 +45,9 @@ private:
 	Mesh* Square;
 	Mesh* Hexagon;
 	Mesh* Objects;
+	Mesh* Cone;
 	GameEntity* Object1;
+	GameEntity* Object2;
 	Material* newMaterial;
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders(); 
@@ -62,6 +64,7 @@ private:
 
 	//Light
 	DirectionalLight dLight;
+	DirectionalLight1 dLight1;
 
 	// The matrices to go from model space to screen space
 	//DirectX::XMFLOAT4X4 worldMatrix;

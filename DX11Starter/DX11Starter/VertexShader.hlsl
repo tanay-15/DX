@@ -77,7 +77,7 @@ VertexToPixel main( VertexShaderInput input )
 
 
 	output.normal = mul(input.normal, (float3x3)world);
-	output.normal = normalize(output.normal);
+	//output.normal = normalize(output.normal);
 	//output.UV = input.UV;
 	// Pass the color through 
 	// - The values will be interpolated per-pixel by the rasterizer
