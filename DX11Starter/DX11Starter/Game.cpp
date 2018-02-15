@@ -78,6 +78,12 @@ void Game::Init()
 	LoadShaders();
 	CreateMatrices();
 	CreateBasicGeometry();
+	
+	//Light intialization
+
+	dLight.AmbientColor = XMFLOAT4(0.1, 0.1, 0.1, 1.0);
+	dLight.DiffuseColor = XMFLOAT4(0, 0, 1, 1);
+	dLight.Direction = XMFLOAT3(1, 1, 0);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -369,6 +375,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	coneIB = Object1->getMesh()->GetIndexBuffer();
 	context->IASetIndexBuffer(coneIB, DXGI_FORMAT_R32_UINT, 0);
 	
+	pixelShader->SetData("light", &light, sizeof(DirectionalLight));
 	context->DrawIndexed(
 		Object1->getMesh()->indexCount,     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use

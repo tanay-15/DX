@@ -5,6 +5,7 @@
 #include"GameEntity.h"
 #include"Camera.h"
 #include "SimpleShader.h"
+#include "Lights.h"
 #include <DirectXMath.h>
 #include<vector>
 using namespace std;
@@ -58,6 +59,9 @@ private:
 	// Wrappers for DirectX shaders to provide simplified functionality
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
+
+	//Light
+	DirectionalLight dLight;
 
 	// The matrices to go from model space to screen space
 	//DirectX::XMFLOAT4X4 worldMatrix;
