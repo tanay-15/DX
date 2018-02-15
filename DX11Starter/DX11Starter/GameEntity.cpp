@@ -28,7 +28,7 @@ XMFLOAT4X4 GameEntity::setScale(float x, float y, float z)
 XMFLOAT4X4 GameEntity::setRotation(float z)
 {
 
-	XMMATRIX rot = XMMatrixRotationZ(z);
+	XMMATRIX rot = XMMatrixRotationY(z);
 	XMStoreFloat4x4(&wmRot, rot);
 	rotation.z = z;
 
@@ -81,6 +81,8 @@ void GameEntity::prepareMaterial(Camera* C)
 	localvertexShader->CopyAllBufferData();
 	localvertexShader->SetShader();
 	localpixelShader->SetShader();
+	//localpixelShader->SetFloat3("")
+	
 }
 
 GameEntity::~GameEntity()

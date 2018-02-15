@@ -83,7 +83,7 @@ void Game::Init()
 
 	dLight.AmbientColor = XMFLOAT4(0.1, 0.1, 0.1, 1.0);
 	dLight.DiffuseColor = XMFLOAT4(0, 0, 1, 1);
-	dLight.Direction = XMFLOAT3(1, 1, 0);
+	dLight.Direction = XMFLOAT3(1, -1, 0);
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -134,14 +134,14 @@ void Game::CreateBasicGeometry()
 	XMFLOAT4 blue = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);*/
 
 	XMFLOAT3 normal = XMFLOAT3(0, 0, -1);
-	XMFLOAT2 uv = XMFLOAT2(0, 0);
+	XMFLOAT2 UV = XMFLOAT2(0, 0);
 
 	Vertex quad[] =												//quadrilateral
 	{
-		{ XMFLOAT3(+0.0f, +1.0f, +0.0f), normal, uv},
-		{ XMFLOAT3(+1.5f, +0.0f, +0.0f), normal, uv},
-		{ XMFLOAT3(+0.0f, -1.0f, +0.0f), normal, uv},
-		{ XMFLOAT3(-1.5f, +0.0f, +0.0f), normal, uv}
+		{ XMFLOAT3(+0.0f, +1.0f, +0.0f), normal, UV},
+		{ XMFLOAT3(+1.5f, +0.0f, +0.0f), normal, UV},
+		{ XMFLOAT3(+0.0f, -1.0f, +0.0f), normal, UV},
+		{ XMFLOAT3(-1.5f, +0.0f, +0.0f), normal, UV}
 	};
 
 	unsigned int qindices[] = { 0, 1, 2, 0, 2, 3};
@@ -155,10 +155,10 @@ void Game::CreateBasicGeometry()
 
 	Vertex square[] =											//square
 	{
-		{ XMFLOAT3(+2.4f, +0.9f, +0.0f), normal, uv },
-		{ XMFLOAT3(+3.2f, +0.0f, +0.0f), normal, uv },
-		{ XMFLOAT3(+2.4f, -0.9f, +0.0f), normal, uv },
-		{ XMFLOAT3(+1.6f, +0.0f, +0.0f), normal, uv }
+		{ XMFLOAT3(+2.4f, +0.9f, +0.0f), normal, UV },
+		{ XMFLOAT3(+3.2f, +0.0f, +0.0f), normal, UV },
+		{ XMFLOAT3(+2.4f, -0.9f, +0.0f), normal, UV },
+		{ XMFLOAT3(+1.6f, +0.0f, +0.0f), normal, UV }
 	};
 
 	unsigned int sindices[] = { 0, 1, 2, 0, 2, 3 };
@@ -168,19 +168,19 @@ void Game::CreateBasicGeometry()
 
 	Vertex hexagon[] =											//Hexagon
 	{
-		{ XMFLOAT3(-2.4f, +0.9f, +0.0f), normal, uv },
-		{ XMFLOAT3(-1.6f, +0.0f, +0.0f), normal, uv },
-		{ XMFLOAT3(-2.4f, -0.9f, +0.0f), normal, uv },
-		{ XMFLOAT3(-3.2f, -0.9f, +0.0f), normal, uv },
-		{ XMFLOAT3(-3.6f, 0.0f, +0.0f), normal, uv },
-		{ XMFLOAT3(-3.2f, +0.9f, +0.0f),normal, uv }
+		{ XMFLOAT3(-2.4f, +0.9f, +0.0f), normal, UV },
+		{ XMFLOAT3(-1.6f, +0.0f, +0.0f), normal, UV },
+		{ XMFLOAT3(-2.4f, -0.9f, +0.0f), normal, UV },
+		{ XMFLOAT3(-3.2f, -0.9f, +0.0f), normal, UV },
+		{ XMFLOAT3(-3.6f, 0.0f, +0.0f), normal, UV },
+		{ XMFLOAT3(-3.2f, +0.9f, +0.0f),normal, UV }
 	};
 
 	unsigned int hindices[] = { 0, 1, 5, 1, 2, 3, 1, 3, 4, 1, 4, 5 };
 	Hexagon = new Mesh(hexagon, hindices, 6, 12, device);
 	Player5 = new GameEntity(Hexagon, newMaterial);
 	
-	Objects = new Mesh("cone.obj", device);
+	Objects = new Mesh("sphere.obj", device);
 	Object1 = new GameEntity(Objects, newMaterial);
 	
 
@@ -227,6 +227,9 @@ void Game::Update(float deltaTime, float totalTime)
 	Player5->setScale(0.5f, 0.5, 0.5f);
 	Player5->setRotation(float(sin(i*0.0015)));
 	Player5->updateWorld();
+	Object1->setRotation(deltaTime);
+	Object1->setTranslation(sin(totalTime) * 2, 0, 0);
+	Object1->updateWorld();
 
 	float speed = 1.5f;
 	if (GetAsyncKeyState(VK_ESCAPE))
@@ -375,7 +378,7 @@ void Game::Draw(float deltaTime, float totalTime)
 	coneIB = Object1->getMesh()->GetIndexBuffer();
 	context->IASetIndexBuffer(coneIB, DXGI_FORMAT_R32_UINT, 0);
 	
-	pixelShader->SetData("light", &light, sizeof(DirectionalLight));
+	pixelShader->SetData("light", &dLight, sizeof(DirectionalLight));
 	context->DrawIndexed(
 		Object1->getMesh()->indexCount,     // The number of indices to use (we could draw a subset if we wanted)
 		0,     // Offset to the first index we want to use
