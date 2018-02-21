@@ -6,6 +6,7 @@
 #include"Camera.h"
 #include "SimpleShader.h"
 #include "Lights.h"
+#include "WICTextureLoader.h"
 #include <DirectXMath.h>
 #include<vector>
 using namespace std;
@@ -62,6 +63,9 @@ private:
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
 
+	ID3D11ShaderResourceView* wallSRV;
+	ID3D11ShaderResourceView* mlavaSRV;
+	ID3D11SamplerState* sampler;
 	//Light
 	DirectionalLight dLight;
 	DirectionalLight1 dLight1;

@@ -45,6 +45,7 @@ struct VertexToPixel
 	float4 position		: SV_POSITION;	// XYZW position (System Value Position)
 	//float4 color		: COLOR;        // RGBA color
 	float3 normal		: NORMAL;
+	float2 UV			: TEXCOORD;
 };
 
 // --------------------------------------------------------
@@ -67,7 +68,9 @@ VertexToPixel main( VertexShaderInput input )
 	// First we multiply them together to get a single matrix which represents
 	// all of those transformations (world to view to projection space)
 	matrix worldViewProj = mul(mul(world, view), projection);
+	
 
+	output.UV = input.UV;
 	// Then we convert our 3-component position vector to a 4-component vector
 	// and multiply it by our final 4x4 matrix.
 	//

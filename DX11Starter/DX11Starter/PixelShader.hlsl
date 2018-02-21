@@ -1,4 +1,3 @@
-
 // Struct representing the data we expect to receive from earlier pipeline stages
 // - Should match the output of our corresponding vertex shader
 // - The name of the struct itself is unimportant
@@ -14,6 +13,7 @@ struct VertexToPixel
 	float4 position		: SV_POSITION;
 	//float4 color		: COLOR;
 	float3 normal		: NORMAL;
+	float2 UV			: TEXCOORD;
 };
 
 
@@ -38,6 +38,10 @@ cbuffer externalData : register(b0)
 	DirectionalLight light;
 	DirectionalLight1 dlight;
 };
+
+Texture2D wallTexture  : register(t0);
+SamplerState basicSampler : register(s0);
+
 // --------------------------------------------------------
 // The entry point (main method) for our pixel shader
 // 
@@ -51,17 +55,19 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	input.normal = normalize(input.normal);
 
+	float4 surfaceColor = wallTexture.Sample(basicSampler, input.UV);
+
 
 	float3 lightDirection = -normalize(light.Direction);
 	float lightAmount = dot(input.normal, lightDirection);
 	lightAmount = saturate(lightAmount);
-	float3 finalColor = (light.DiffuseColor * lightAmount + light.AmbientColor);
+	float3 finalColor = surfaceColor * (light.DiffuseColor * lightAmount + light.AmbientColor);
 
 
 	float3 lightDirection1 = -normalize(dlight.Direction);
 	float lightAmount1 = dot(input.normal, lightDirection1);
 	lightDirection1 = saturate(lightAmount1);
-	float3 finalColor1 = (dlight.DiffuseColor *lightAmount1 + dlight.AmbientColor);
+	float3 finalColor1 = surfaceColor * (dlight.DiffuseColor *lightAmount1 + dlight.AmbientColor);
 
 
 	return float4((finalColor + finalColor1).xyz, 1);

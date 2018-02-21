@@ -81,6 +81,8 @@ void GameEntity::prepareMaterial(Camera* C)
 	localvertexShader->CopyAllBufferData();
 	localpixelShader->CopyAllBufferData();
 	localvertexShader->SetShader();
+	localpixelShader->SetShaderResourceView("wallTexture", this->getMaterial()->getSRV());
+	localpixelShader->SetSamplerState("basicSampler", this->getMaterial()->getsamplerState());
 	localpixelShader->SetShader();
 	//localpixelShader->SetFloat3("")
 	

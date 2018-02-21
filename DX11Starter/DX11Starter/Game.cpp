@@ -63,6 +63,8 @@ Game::~Game()
 	delete newMaterial;
 	delete Object1;
 	delete Objects;
+	delete Cone;
+	delete Object2;
 	
 }
 
@@ -72,12 +74,29 @@ Game::~Game()
 // --------------------------------------------------------
 void Game::Init()
 {
+
+	CreateWICTextureFromFile(device, context, L"Wall4.JPG", 0, &wallSRV);
+	//CreateWICTextureFromFile(device, context, L"mLava.tif", 0, &mlavaSRV);
+
+	D3D11_SAMPLER_DESC sd = {}; // Zeros it out
+	sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; // Tri-linear filtering
+												 //sd.Filter = D3D11_FILTER_ANISOTROPIC;
+												 //sd.MaxAnisotropy = 16;
+	sd.MaxLOD = D3D11_FLOAT32_MAX;
+
+	device->CreateSamplerState(&sd, &sampler);
+
 	// Helper methods for loading shaders, creating some basic
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
 	CreateMatrices();
 	CreateBasicGeometry();
+
+	
 	
 	//Light intialization
 
@@ -110,7 +129,7 @@ void Game::LoadShaders()
 	pixelShader = new SimplePixelShader(device, context);
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
 
-	newMaterial = new Material(vertexShader, pixelShader);
+	newMaterial = new Material(vertexShader, pixelShader,wallSRV, sampler);
 }
 
 
