@@ -61,6 +61,7 @@ Game::~Game()
 	delete Player5;
 	delete View;
 	delete newMaterial;
+	delete lava;
 	delete Object1;
 	delete Objects;
 	delete Cone;
@@ -76,7 +77,7 @@ void Game::Init()
 {
 
 	CreateWICTextureFromFile(device, context, L"Wall4.JPG", 0, &wallSRV);
-	//CreateWICTextureFromFile(device, context, L"mLava.tif", 0, &mlavaSRV);
+	CreateWICTextureFromFile(device, context, L"redWall.JPG", 0, &redSRV);
 
 	D3D11_SAMPLER_DESC sd = {}; // Zeros it out
 	sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -101,11 +102,11 @@ void Game::Init()
 	//Light intialization
 
 	dLight.AmbientColor = XMFLOAT4(0.1, 0.1, 0.1, 1.0);
-	dLight.DiffuseColor = XMFLOAT4(0, 0, 1, 1);
+	dLight.DiffuseColor = XMFLOAT4(0.2, 0.9, 0.6, 1);
 	dLight.Direction = XMFLOAT3(1, -1, 0);
 
 	dLight1.AmbientColor = XMFLOAT4(0.1, 0.1, 0.1, 1.0);
-	dLight1.DiffuseColor = XMFLOAT4(1, 0, 0, 1);
+	dLight1.DiffuseColor = XMFLOAT4(0.8, 0.8, 0.3, 1);
 	dLight1.Direction = XMFLOAT3(-1, 1, 0);
 
 
@@ -130,6 +131,7 @@ void Game::LoadShaders()
 	pixelShader->LoadShaderFile(L"PixelShader.cso");
 
 	newMaterial = new Material(vertexShader, pixelShader,wallSRV, sampler);
+	lava = new Material(vertexShader, pixelShader, redSRV, sampler);
 }
 
 
@@ -207,8 +209,8 @@ void Game::CreateBasicGeometry()
 	Objects = new Mesh("sphere.obj", device);
 	Object1 = new GameEntity(Objects, newMaterial);
 	
-	Cone = new Mesh("cone.obj", device);
-	Object2 = new GameEntity(Cone, newMaterial);
+	Cone = new Mesh("torus.obj", device);
+	Object2 = new GameEntity(Cone, lava);
 }
 
 
@@ -298,7 +300,7 @@ void Game::datatoShader(GameEntity* GE, Camera* C)
 void Game::Draw(float deltaTime, float totalTime)
 {
 	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = { 0.0f, 0.6f, 0.75f, 0.0f };
+	const float color[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	context->ClearRenderTargetView(backBufferRTV, color);
 	context->ClearDepthStencilView(

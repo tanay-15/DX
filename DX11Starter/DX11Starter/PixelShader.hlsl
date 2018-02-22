@@ -40,6 +40,7 @@ cbuffer externalData : register(b0)
 };
 
 Texture2D wallTexture  : register(t0);
+Texture2D lavaTexture	: register(t1);
 SamplerState basicSampler : register(s0);
 
 // --------------------------------------------------------

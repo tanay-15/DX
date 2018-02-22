@@ -50,6 +50,7 @@ private:
 	GameEntity* Object1;
 	GameEntity* Object2;
 	Material* newMaterial;
+	Material* lava;
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders(); 
 	void CreateMatrices();
@@ -64,7 +65,7 @@ private:
 	SimplePixelShader* pixelShader;
 
 	ID3D11ShaderResourceView* wallSRV;
-	ID3D11ShaderResourceView* mlavaSRV;
+	ID3D11ShaderResourceView* redSRV;
 	ID3D11SamplerState* sampler;
 	//Light
 	DirectionalLight dLight;
